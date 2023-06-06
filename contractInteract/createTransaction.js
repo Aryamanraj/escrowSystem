@@ -1,16 +1,18 @@
-const ethers = require('ethers');
+const ethers = require("ethers");
 
-async function createTransaction(contract, _transactionId, seller, arbitrator, amount) {
+const createTransaction = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    const tx = await contract.createTransaction(transactionId, seller, arbitrator, { value: amount });
-    await tx.wait(); // wait transaction time
-    console.log('Transaction created successfully!');
+    const { transactionId, sellerAddress, arbitratorAddress, amount, contract } = req.body;
+    console.log(transactionId, sellerAddress, arbitratorAddress, amount, contract)
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.createTransaction(transactionIdBytes32, sellerAddress, arbitratorAddress, { value: amount });
+    // await tx.wait();
+    res.status(200).json({ message: "Transaction created successfully!" });
   } catch (error) {
-    console.error('Failed to create transaction: ', error);
-  }
-}
+    console.error("Failed to create transaction: ", error);
+    res.status(500).json({ error: "Failed to create transaction" });
+ }
 
+};
 
 module.exports = { createTransaction };

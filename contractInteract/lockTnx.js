@@ -1,20 +1,16 @@
 const ethers = require("ethers");
 
-async function lockTnx(
-  contract,
-  _transactionId,
-  disputeDuration
-) {
+const lockTransaction = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    const tx = await contract.lockTransaction(transactionId, disputeDuration);
+    const { contract, transactionId, disputeDuration } = req.body;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.lockTransaction(transactionIdBytes32, disputeDuration);
     await tx.wait();
-
-    console.log("Transaction locked successfully.");
+    res.status(200).json({ message: "Transaction locked successfully" });
   } catch (error) {
-    console.error("Failed to Lock Transaction: ", error);
+    console.error("Failed to lock transaction: ", error);
+    res.status(500).json({ error: "Failed to lock transaction" });
   }
-}
+};
 
-module.exports = { lockTnx };
+module.exports = { lockTransaction };

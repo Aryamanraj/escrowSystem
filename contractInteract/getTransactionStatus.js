@@ -1,15 +1,15 @@
 const ethers = require("ethers");
 
-async function getTnxStatus(contract, _transactionId) {
+const getTransactionStatus = async (contract, req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    //     console.log(signer)
-    const status = await contract.getTransactionStatus(transactionId);
-    console.log("Transaction status:", status);
+    const { transactionId } = req.params;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const status = await contract.getTransactionStatus(transactionIdBytes32);
+    res.status(200).json({ status });
   } catch (error) {
-    console.error("Failed to get Transaction Status: ", error);
+    console.error("Failed to get transaction status: ", error);
+    res.status(500).json({ error: "Failed to get transaction status" });
   }
-}
+};
 
-module.exports = { getTnxStatus };
+module.exports = { getTransactionStatus };

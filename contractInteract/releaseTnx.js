@@ -1,15 +1,16 @@
 const ethers = require("ethers");
 
-async function releaseTnx(contract, _transactionId) {
+const releaseTransaction = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    const tx = await contract.releaseTransaction(transactionId);
+    const { contract, transactionId } = req.params;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.releaseTransaction(transactionIdBytes32);
     await tx.wait();
-    console.log("Transaction released successfully.");
+    res.status(200).json({ message: "Transaction released successfully" });
   } catch (error) {
-    console.error("Failed to released transaction: ", error);
+    console.error("Failed to release transaction: ", error);
+    res.status(500).json({ error: "Failed to release transaction" });
   }
-}
+};
 
-module.exports = { releaseTnx };
+module.exports = { releaseTransaction };

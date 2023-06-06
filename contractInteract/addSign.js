@@ -1,17 +1,16 @@
-const ethers = require('ethers');
+const ethers = require("ethers");
 
-async function addSign(contract, _transactionId, signer) {
+const addSignature = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-//     console.log(transactionId);
-//     console.log(signer)
-    const tx = await contract.addSignature(transactionId);
-    await tx.wait(); // wait transaction time
-    console.log('Signature added successfully for: ', signer);
+    const { contract, transactionId, signer } = req.body;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.addSignature(transactionIdBytes32);
+    await tx.wait();
+    res.status(200).json({ message: `Signature added successfully for: ${signer}` });
   } catch (error) {
-    console.error('Failed to add signature: ', error);
+    console.error("Failed to add signature: ", error);
+    res.status(500).json({ error: "Failed to add signature" });
   }
-}
+};
 
-
-module.exports = { addSign };
+module.exports = { addSignature };

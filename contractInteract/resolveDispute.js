@@ -1,16 +1,16 @@
 const ethers = require("ethers");
 
-async function resDispute(contract, _transactionId, isBuyerWinner) {
+const resolveDispute = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    const tx = await contract.resolveDispute(transactionId, isBuyerWinner);
+    const { contract, transactionId, isBuyerWinner } = req.body;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.resolveDispute(transactionIdBytes32, isBuyerWinner);
     await tx.wait();
-
-    console.log("Dispute resolved successfully.");
+    res.status(200).json({ message: "Dispute resolved successfully" });
   } catch (error) {
-    console.error("Failed to resolve Dispute: ", error);
+    console.error("Failed to resolve dispute: ", error);
+    res.status(500).json({ error: "Failed to resolve dispute" });
   }
-}
+};
 
-module.exports = { resDispute };
+module.exports = { resolveDispute };

@@ -1,15 +1,16 @@
 const ethers = require("ethers");
 
-async function iniDispute(contract, _transactionId, disputeReasonIPFS) {
+const initiateDispute = async (req, res) => {
   try {
-    const transactionId = ethers.encodeBytes32String(_transactionId); // convert team name str to bytes32
-    console.log(transactionId);
-    const tx = await contract.initiateDispute(transactionId, disputeReasonIPFS);
+    const { contract, transactionId, disputeReasonIPFS } = req.body;
+    const transactionIdBytes32 = ethers.utils.formatBytes32String(transactionId);
+    const tx = await contract.initiateDispute(transactionIdBytes32, disputeReasonIPFS);
     await tx.wait();
-    console.log("Dispute initiated successfully.");
+    res.status(200).json({ message: "Dispute initiated successfully" });
   } catch (error) {
-    console.error("Failed to initiate Dispute: ", error);
+    console.error("Failed to initiate dispute: ", error);
+    res.status(500).json({ error: "Failed to initiate dispute" });
   }
-}
+};
 
-module.exports = { iniDispute };
+module.exports = { initiateDispute };
